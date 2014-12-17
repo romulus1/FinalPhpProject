@@ -1,22 +1,24 @@
 <?php
-    require_once(__DIR__ . "/../model/config.php");
-    
-    $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
-    $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_STRING);
-    
-    $query = $_SESSION["connection"]->query("SELECT salt, password FROM users WHERE username = '$username'");
-    
-    if($query->num_rows ==1) {
-        $row = $query->fetch_array();
-        
-        if($row["password"] === crypt($password, $row["salt"])) {
-            $_SESSION["authenticated"] = true;
-            echo "<p>Login successful!</p>";
-        }
-        else {
-            echo "<p>Invalid username and password</p>";
-        }
-    }
-    else {
-        echo "<p>Invalid username and password</p>";
-    }
+	require_once(__DIR__ . "/../model/config.php");
+
+	$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING); //filters input recieved from a post that is being submitted to the file
+	$password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_STRING); //filters input recieved from a post that is being submitted to the file
+
+                //selects the salt & password from the table "users" where username is = to the username that the user has input
+	$query = $_SESSION["connection"]->query("SELECT salt, password FROM users WHERE username = '$username'");
+
+	if($query->num_rows == 1){
+		$row = $query->fetch_array(); //acquires data from the table users and stores it in $row
+
+		if($row["password"] === crypt($password, $row["salt"])){ //checks the password if it was correct 
+			$_SESSION["authenticated"] = true; //creates a new session variable
+			header("Location: " . $path . "index.php"); //directs the user back to index.php
+		}
+		else {
+			echo "<p>Invalid username and password</p>";
+			
+		}
+	}
+	else {
+		echo "<p>Invalid username and password</p>";
+	}
